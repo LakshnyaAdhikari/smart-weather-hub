@@ -18,6 +18,8 @@ const chartConfigs = [
   { key: "humidity",    label: "Humidity (%)",     color: "hsl(199, 89%, 48%)", dataKey: "humidity" },
   { key: "airQuality",  label: "Air Quality (AQI)", color: "hsl(38, 92%, 50%)", dataKey: "airQuality" },
   { key: "rainValue",   label: "Rain Value",        color: "hsl(210, 70%, 55%)", dataKey: "rainValue" },
+  { key: "pressure",    label: "Pressure (hPa)",    color: "hsl(262, 83%, 58%)", dataKey: "pressure" },
+  { key: "altitude",    label: "Altitude (m)",      color: "hsl(168, 74%, 45%)", dataKey: "altitude" },
 ] as const;
 
 // Tooltip style that reads --card / --foreground CSS vars for light/dark compat
@@ -37,6 +39,8 @@ export default function WeatherCharts({ history }: Props) {
       humidity: d.humidity,
       airQuality: d.airQuality,
       rainValue: d.rainValue,
+      pressure: d.pressure,
+      altitude: d.altitude,
     })),
     [history]
   );
