@@ -64,7 +64,7 @@ export default function SensorCards({ data, thresholds = DEFAULT_THRESHOLDS }: P
     {
       title: "Rain",
       value: data.rainStatus ? "Raining" : "Dry",
-      unit: data.rainValue !== null ? `(${data.rainValue.toFixed(0)})` : "",
+      unit: data.rainValue !== null ? `Intensity: ${data.rainValue.toFixed(0)}` : "",
       icon: <CloudRain className="w-5 h-5" />,
       color: "text-rain",
       status: data.rainStatus ? "warning" as StatusLevel : "safe" as StatusLevel,
@@ -72,7 +72,7 @@ export default function SensorCards({ data, thresholds = DEFAULT_THRESHOLDS }: P
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {cards.map((c) => (
         <SensorCard key={c.title} {...c} />
       ))}
