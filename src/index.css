@@ -65,6 +65,66 @@
     --sidebar-border: 222 30% 18%;
     --sidebar-ring: 199 89% 48%;
   }
+
+  /* ── Light theme ───────────────────────────────────────────── */
+  .light {
+    --background: 210 40% 97%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 199 89% 38%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 92%;
+    --secondary-foreground: 222 47% 20%;
+
+    --muted: 210 40% 90%;
+    --muted-foreground: 215 16% 40%;
+
+    --accent: 262 83% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 84%;
+    --input: 214 32% 84%;
+    --ring: 199 89% 38%;
+
+    /* Semantic weather tokens */
+    --safe: 142 55% 38%;
+    --safe-foreground: 142 55% 10%;
+    --warning: 38 92% 42%;
+    --warning-foreground: 38 92% 10%;
+    --danger: 0 72% 45%;
+    --danger-foreground: 0 72% 95%;
+
+    /* Sensor accent colors */
+    --temp: 15 85% 48%;
+    --humidity: 199 89% 38%;
+    --pressure: 262 70% 50%;
+    --altitude: 168 60% 38%;
+    --aqi: 38 92% 42%;
+    --rain: 210 65% 45%;
+
+    /* Glass effect */
+    --glass: 0 0% 100%;
+    --glass-border: 214 32% 80%;
+
+    --sidebar-background: 210 40% 95%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 199 89% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 40% 92%;
+    --sidebar-accent-foreground: 222 47% 20%;
+    --sidebar-border: 214 32% 84%;
+    --sidebar-ring: 199 89% 38%;
+  }
 }
 
 @layer base {
