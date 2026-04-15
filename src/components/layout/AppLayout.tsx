@@ -3,12 +3,12 @@ import SideNavbar from "../dashboard/SideNavbar";
 import UserProfilePanel from "../dashboard/UserProfilePanel";
 import { useWeather } from "@/hooks/useWeather";
 import { motion, AnimatePresence } from "framer-motion";
-import { Cloud, RefreshCw } from "lucide-react";
+import { Cloud, RefreshCw, Wifi, WifiOff, FlaskConical } from "lucide-react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 
 export default function AppLayout() {
-  const { config, current, lastUpdated, error, history, loading, refetch } = useWeather();
+  const { config, current, lastUpdated, error, history, loading, mqttStatus, simulateMqtt, toggleSimulateMqtt, refetch } = useWeather();
   const location = useLocation();
 
   const getPageTitle = () => {
@@ -33,6 +33,44 @@ export default function AppLayout() {
           </div>
 
           <div className="flex items-center gap-4">
+            {/* MQTT Status Badge */}
+            {config.channelId && (
+              <span
+                className={`hidden sm:flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border transition-colors ${
+                  mqttStatus === "connected"
+                    ? "bg-green-500/10 text-green-600 border-green-500/30 dark:text-green-400"
+                    : mqttStatus === "connecting"
+                    ? "bg-yellow-500/10 text-yellow-600 border-yellow-500/30 dark:text-yellow-400"
+                    : mqttStatus === "error"
+                    ? "bg-red-500/10 text-red-600 border-red-500/30 dark:text-red-400"
+                    : "bg-muted text-muted-foreground border-border"
+                }`}
+              >
+                {mqttStatus === "connected" ? (
+                  <><Wifi className="w-3 h-3" /> {simulateMqtt ? "MQTT Simulated" : "MQTT Live"}</>
+                ) : mqttStatus === "connecting" ? (
+                  <><Wifi className="w-3 h-3 animate-pulse" /> Connecting…</>
+                ) : mqttStatus === "error" ? (
+                  <><WifiOff className="w-3 h-3" /> MQTT Error</>
+                ) : (
+                  <><WifiOff className="w-3 h-3" /> HTTP Polling</>
+                )}
+              </span>
+            )}
+            {/* Simulate Toggle */}
+            {config.channelId && (
+              <Button
+                variant={simulateMqtt ? "default" : "outline"}
+                size="sm"
+                onClick={toggleSimulateMqtt}
+                className="gap-1.5 text-xs hidden md:flex"
+                title="Toggle MQTT simulation"
+              >
+                <FlaskConical className="w-3.5 h-3.5" />
+                <span>{simulateMqtt ? "Simulating" : "Simulate"}</span>
+              </Button>
+            )}
+
             <div className="hidden md:flex flex-col items-end mr-2">
               <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest leading-none mb-1">Last Update</p>
               <p className="text-xs font-mono font-medium">{lastUpdated ? lastUpdated.toLocaleTimeString() : "--:--:--"}</p>

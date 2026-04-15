@@ -1,8 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
-import type { SensorData, ThingSpeakConfig, Alert, AIInsight, Thresholds } from "@/types/weather";
+import type { SensorData, ThingSpeakConfig, Alert, AIInsight, Thresholds, MqttStatus } from "@/types/weather";
 import { DEFAULT_THRESHOLDS } from "@/types/weather";
 import { fetchLatestFeeds } from "@/services/thingspeak";
 import { generateAlerts, generateInsights } from "@/services/ai-insights";
+import { useMqttWeather } from "@/hooks/useMqttWeather";
+import { useMqttSimulator } from "@/hooks/useMqttSimulator";
 
 const POLL_INTERVAL = 15_000;
 const STORAGE_KEY = "weatherDashConfig";
@@ -42,8 +44,11 @@ interface WeatherContextType {
   lastUpdated: Date | null;
   config: ThingSpeakConfig;
   thresholds: Thresholds;
+  mqttStatus: MqttStatus;
+  simulateMqtt: boolean;
   refetch: () => Promise<void>;
   updateConfig: (config: ThingSpeakConfig, thresholds: Thresholds) => void;
+  toggleSimulateMqtt: () => void;
 }
 
 const WeatherContext = createContext<WeatherContextType | undefined>(undefined);
@@ -52,45 +57,64 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [config, setConfig] = useState<ThingSpeakConfig>(loadConfig);
   const [thresholds, setThresholds] = useState<Thresholds>(loadThresholds);
   const [history, setHistory] = useState<SensorData[]>([]);
-  const [current, setCurrent] = useState<SensorData | null>(null);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [insights, setInsights] = useState<AIInsight[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [httpLoading, setHttpLoading] = useState(false);
+  const [httpError, setHttpError] = useState<string | null>(null);
+  const [httpLastUpdated, setHttpLastUpdated] = useState<Date | null>(null);
+  const [simulateMqtt, setSimulateMqtt] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // ── Real MQTT ───────────────────────────────────────────────────────────
+  const realMqtt = useMqttWeather(simulateMqtt ? { channelId: "", apiKey: "" } : config);
+
+  // ── Simulated MQTT ──────────────────────────────────────────────────────
+  const simMqtt = useMqttSimulator();
+
+  const { current: mqttCurrent, status: mqttStatus, error: mqttError, lastUpdated: mqttLastUpdated } =
+    simulateMqtt ? simMqtt : realMqtt;
+
+  // ── HTTP fallback ───────────────────────────────────────────────────────
   const fetchData = useCallback(async () => {
     if (!config.channelId) return;
-    setLoading(true);
-    setError(null);
+    setHttpLoading(true);
+    setHttpError(null);
     try {
       const feeds = await fetchLatestFeeds(config.channelId, config.apiKey || undefined);
       setHistory(feeds);
-      if (feeds.length > 0) {
-        const latest = feeds[feeds.length - 1];
-        setCurrent(latest);
-        setAlerts(generateAlerts(latest, thresholds));
-        setInsights(generateInsights(feeds, thresholds));
-        setLastUpdated(new Date());
-      }
+      setHttpLastUpdated(new Date());
     } catch (err: any) {
-      setError(err.message || "Failed to fetch data");
+      setHttpError(err.message || "Failed to fetch data");
     } finally {
-      setLoading(false);
+      setHttpLoading(false);
     }
   }, [config.channelId, config.apiKey, thresholds]);
 
   useEffect(() => {
     fetchData();
     if (intervalRef.current) clearInterval(intervalRef.current);
-    if (config.channelId) {
+    if (config.channelId && mqttStatus !== "connected") {
       intervalRef.current = setInterval(fetchData, POLL_INTERVAL);
     }
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [fetchData, config.channelId]);
+  }, [fetchData, mqttStatus, config.channelId]);
+
+  // Push MQTT readings into history
+  useEffect(() => {
+    if (mqttCurrent) {
+      setHistory((prev) => [...prev, mqttCurrent].slice(-100));
+    }
+  }, [mqttCurrent]);
+
+  const httpCurrent = history.length > 0 ? history[history.length - 1] : null;
+  const current = mqttCurrent ?? httpCurrent;
+
+  useEffect(() => {
+    if (current) setAlerts(generateAlerts(current, thresholds));
+    if (history.length > 0) setInsights(generateInsights(history, thresholds));
+  }, [current, history, thresholds]);
 
   const updateConfig = (newConfig: ThingSpeakConfig, newThresholds: Thresholds) => {
     saveConfig(newConfig);
@@ -98,6 +122,10 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setConfig(newConfig);
     setThresholds(newThresholds);
   };
+
+  const loading = httpLoading;
+  const error = mqttStatus === "connected" ? null : (mqttError ?? httpError);
+  const lastUpdated = mqttLastUpdated ?? httpLastUpdated;
 
   return (
     <WeatherContext.Provider
@@ -111,8 +139,11 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
         lastUpdated,
         config,
         thresholds,
+        mqttStatus,
+        simulateMqtt,
         refetch: fetchData,
         updateConfig,
+        toggleSimulateMqtt: () => setSimulateMqtt((v) => !v),
       }}
     >
       {children}

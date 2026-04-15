@@ -42,6 +42,9 @@ export interface ThingSpeakConfig {
   apiKey: string;
 }
 
+/** MQTT connection status */
+export type MqttStatus = "disconnected" | "connecting" | "connected" | "error";
+
 export type StatusLevel = "safe" | "warning" | "danger";
 
 export interface Alert {
