@@ -1,4 +1,4 @@
-import mqtt, { type MqttClient } from "mqtt";
+import mqtt, { type MqttClient } from "mqtt"; 
 import { parseFeed } from "./thingspeak";
 import type { SensorData, ThingSpeakFeed } from "@/types/weather";
 

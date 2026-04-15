@@ -1,6 +1,8 @@
 import { Outlet, useLocation } from "react-router-dom";
 import SideNavbar from "../dashboard/SideNavbar";
 import UserProfilePanel from "../dashboard/UserProfilePanel";
+import AlertsPanel from "../dashboard/AlertsPanel";
+import SystemStatus from "../dashboard/SystemStatus";
 import { useWeather } from "@/hooks/useWeather";
 import { motion, AnimatePresence } from "framer-motion";
 import { Cloud, RefreshCw, Wifi, WifiOff, FlaskConical } from "lucide-react";
@@ -8,7 +10,7 @@ import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 
 export default function AppLayout() {
-  const { config, current, lastUpdated, error, history, loading, mqttStatus, simulateMqtt, toggleSimulateMqtt, refetch } = useWeather();
+  const { config, current, alerts, lastUpdated, error, history, loading, mqttStatus, simulateMqtt, toggleSimulateMqtt, refetch } = useWeather();
   const location = useLocation();
 
   const getPageTitle = () => {
@@ -119,8 +121,8 @@ export default function AppLayout() {
             </AnimatePresence>
           </div>
 
-          {/* User Profile Panel (Sticky on right during dashboard view) */}
-          <div className="hidden xl:block">
+          {/* User Profile + Health Sidebar (Sticky on right) */}
+          <div className="hidden xl:flex flex-col gap-6 w-[320px] shrink-0 pb-8">
             <UserProfilePanel
               config={config}
               current={current}
@@ -128,6 +130,23 @@ export default function AppLayout() {
               error={error}
               dataPoints={history.length}
             />
+            
+            {/* System Health moved here from OverviewPage */}
+            <div className="space-y-6 sticky top-24">
+               <div>
+                  <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-4 px-1">Active Alerts</h3>
+                  <AlertsPanel alerts={alerts} />
+               </div>
+               <div>
+                  <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-4 px-1">System Health</h3>
+                  <SystemStatus
+                    lastUpdated={lastUpdated}
+                    loading={loading}
+                    error={error}
+                    dataPoints={history.length}
+                  />
+               </div>
+            </div>
           </div>
         </main>
       </div>

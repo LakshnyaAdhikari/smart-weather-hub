@@ -6,47 +6,25 @@ import SystemStatus from "@/components/dashboard/SystemStatus";
 import { useWeather } from "@/hooks/useWeather";
 
 export default function OverviewPage() {
-  const { history, current, alerts, thresholds, lastUpdated, loading, error } = useWeather();
+  const { history, current, alerts, thresholds } = useWeather();
 
   return (
-    <div className="space-y-6">
-      {/* Metrics Row */}
+    <div className="space-y-12">
+      {/* Metrics Row (3x2 Grid) */}
       <section>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Live Metrics</h3>
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Environmental Live Feed</h3>
         </div>
         <SensorCards data={current} thresholds={thresholds} />
       </section>
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-2 space-y-6">
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Historical Trends</h3>
-            </div>
-            {/* Show only primary charts on overview */}
-            <WeatherCharts history={history} />
-          </section>
+      {/* Historical Trends section (Now full width 3x2 Grid) */}
+      <section>
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Historical Analytics (24h)</h3>
         </div>
-
-        <div className="space-y-6">
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">System Health</h3>
-            </div>
-            <div className="space-y-4">
-              <AlertsPanel alerts={alerts} />
-              <SystemStatus
-                lastUpdated={lastUpdated}
-                loading={loading}
-                error={error}
-                dataPoints={history.length}
-              />
-            </div>
-          </section>
-        </div>
-      </div>
+        <WeatherCharts history={history} />
+      </section>
     </div>
   );
 }
