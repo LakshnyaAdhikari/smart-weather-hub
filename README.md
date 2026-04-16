@@ -1,3 +1,3 @@
-# Welcome to your Lovable project
+# Smart Weather Hub
 
-TODO: Document your project here
+A real-time weather monitoring dashboard.
