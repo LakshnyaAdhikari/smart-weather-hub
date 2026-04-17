@@ -46,9 +46,11 @@ interface WeatherContextType {
   thresholds: Thresholds;
   mqttStatus: MqttStatus;
   simulateMqtt: boolean;
+  useMqtt: boolean;
   refetch: () => Promise<void>;
   updateConfig: (config: ThingSpeakConfig, thresholds: Thresholds) => void;
   toggleSimulateMqtt: () => void;
+  toggleUseMqtt: () => void;
 }
 
 const WeatherContext = createContext<WeatherContextType | undefined>(undefined);
@@ -63,10 +65,12 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [httpError, setHttpError] = useState<string | null>(null);
   const [httpLastUpdated, setHttpLastUpdated] = useState<Date | null>(null);
   const [simulateMqtt, setSimulateMqtt] = useState(false);
+  const [useMqtt, setUseMqtt] = useState(true);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ── Real MQTT ───────────────────────────────────────────────────────────
-  const realMqtt = useMqttWeather(simulateMqtt ? { channelId: "", apiKey: "" } : config);
+  // Disconnect if simulating OR if useMqtt is toggled off
+  const realMqtt = useMqttWeather((simulateMqtt || !useMqtt) ? { channelId: "", apiKey: "" } : config);
 
   // ── Simulated MQTT ──────────────────────────────────────────────────────
   const simMqtt = useMqttSimulator();
@@ -141,9 +145,11 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
         thresholds,
         mqttStatus,
         simulateMqtt,
+        useMqtt,
         refetch: fetchData,
         updateConfig,
         toggleSimulateMqtt: () => setSimulateMqtt((v) => !v),
+        toggleUseMqtt: () => setUseMqtt((v) => !v),
       }}
     >
       {children}

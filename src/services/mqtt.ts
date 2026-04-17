@@ -11,7 +11,7 @@ export interface MqttConnectionOptions {
   onDisconnect?: () => void;
 }
 
-const THINGSPEAK_BROKER = "wss://mqtt3.thingspeak.com:8884/mqtt";
+const THINGSPEAK_BROKER = "wss://mqtt3.thingspeak.com:443/mqtt";
 
 /**
  * Connects to the ThingSpeak MQTT broker and subscribes to all fields
@@ -24,9 +24,9 @@ export function connectMqtt(opts: MqttConnectionOptions): () => void {
   const topic = `channels/${channelId}/subscribe/fields/+`;
 
   const client: MqttClient = mqtt.connect(THINGSPEAK_BROKER, {
-    clientId: `smart-weather-hub-${Math.random().toString(16).slice(2, 8)}`,
-    username: apiKey,      // ThingSpeak: read API key as username
-    password: apiKey,      // ThingSpeak: read API key as password
+    clientId: import.meta.env.VITE_MQTT_CLIENT_ID || `smart-weather-hub-${Math.random().toString(16).slice(2, 8)}`,
+    username: import.meta.env.VITE_MQTT_USERNAME || apiKey,      // Use env var first, then fallback
+    password: import.meta.env.VITE_MQTT_PASSWORD || apiKey,      // Use env var first, then fallback
     clean: true,
     reconnectPeriod: 5000, // auto-reconnect every 5 s
     connectTimeout: 10_000,

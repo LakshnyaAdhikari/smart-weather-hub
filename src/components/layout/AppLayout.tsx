@@ -10,7 +10,7 @@ import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 
 export default function AppLayout() {
-  const { config, current, alerts, lastUpdated, error, history, loading, mqttStatus, simulateMqtt, toggleSimulateMqtt, refetch } = useWeather();
+  const { config, current, alerts, lastUpdated, error, history, loading, mqttStatus, simulateMqtt, useMqtt, toggleSimulateMqtt, toggleUseMqtt, refetch } = useWeather();
   const location = useLocation();
 
   const getPageTitle = () => {
@@ -35,11 +35,15 @@ export default function AppLayout() {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* MQTT Status Badge */}
+            {/* MQTT Status Badge Toggle */}
             {config.channelId && (
-              <span
-                className={`hidden sm:flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border transition-colors ${
-                  mqttStatus === "connected"
+              <button
+                onClick={toggleUseMqtt}
+                title="Click to toggle between MQTT and HTTP polling"
+                className={`hidden sm:flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border transition-colors cursor-pointer hover:opacity-80 active:scale-95 ${
+                  !useMqtt
+                    ? "bg-slate-500/10 text-slate-600 border-slate-500/30 dark:text-slate-400"
+                    : mqttStatus === "connected"
                     ? "bg-green-500/10 text-green-600 border-green-500/30 dark:text-green-400"
                     : mqttStatus === "connecting"
                     ? "bg-yellow-500/10 text-yellow-600 border-yellow-500/30 dark:text-yellow-400"
@@ -48,16 +52,18 @@ export default function AppLayout() {
                     : "bg-muted text-muted-foreground border-border"
                 }`}
               >
-                {mqttStatus === "connected" ? (
+                {!useMqtt ? (
+                  <><Cloud className="w-3 h-3" /> HTTP Polling</>
+                ) : mqttStatus === "connected" ? (
                   <><Wifi className="w-3 h-3" /> {simulateMqtt ? "MQTT Simulated" : "MQTT Live"}</>
                 ) : mqttStatus === "connecting" ? (
                   <><Wifi className="w-3 h-3 animate-pulse" /> Connecting…</>
                 ) : mqttStatus === "error" ? (
                   <><WifiOff className="w-3 h-3" /> MQTT Error</>
                 ) : (
-                  <><WifiOff className="w-3 h-3" /> HTTP Polling</>
+                  <><WifiOff className="w-3 h-3" /> Disconnected</>
                 )}
-              </span>
+              </button>
             )}
             {/* Simulate Toggle */}
             {config.channelId && (
