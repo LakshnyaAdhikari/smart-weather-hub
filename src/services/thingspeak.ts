@@ -11,8 +11,10 @@ export function parseFeed(feed: ThingSpeakFeed): SensorData {
     altitude: feed.field4 ? parseFloat(feed.field4) : null,
     airQuality: feed.field5 ? parseFloat(feed.field5) : null,
     rainValue: feed.field6 ? parseFloat(feed.field6) : null,
-    rainStatus: feed.field7 === "1",
-    poorAqiFlag: feed.field8 === "1",
+    rainStatus: false, // Deprecated, replaced by AI
+    poorAqiFlag: false, // Deprecated, replaced by AI
+    aiPrediction: feed.field7 ? parseFloat(feed.field7) : null,
+    aiConfidence: feed.field8 ? parseFloat(feed.field8) : null,
   };
 }
 

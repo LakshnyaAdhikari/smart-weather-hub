@@ -35,6 +35,8 @@ export interface SensorData {
   rainValue: number | null;
   rainStatus: boolean;
   poorAqiFlag: boolean;
+  aiPrediction: number | null;
+  aiConfidence: number | null;
 }
 
 export interface ThingSpeakConfig {
