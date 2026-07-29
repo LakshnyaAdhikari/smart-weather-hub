@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import SideNavbar from "../dashboard/SideNavbar";
 import UserProfilePanel from "../dashboard/UserProfilePanel";
 import AlertsPanel from "../dashboard/AlertsPanel";
@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 export default function AppLayout() {
   const { config, current, alerts, lastUpdated, error, history, loading, mqttStatus, simulateMqtt, useMqtt, toggleSimulateMqtt, toggleUseMqtt, refetch } = useWeather();
   const location = useLocation();
+  const isSettingsRoute = location.pathname === "/settings";
 
   const getPageTitle = () => {
     const path = location.pathname;
@@ -107,7 +108,7 @@ export default function AppLayout() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                {!config.channelId ? (
+                {!config.channelId && !isSettingsRoute ? (
                   <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
                     <div className="p-4 rounded-3xl bg-primary/10 mb-6">
                       <Cloud className="w-16 h-16 text-primary" />
@@ -117,7 +118,7 @@ export default function AppLayout() {
                       Your IoT ecosystem is ready. Please connect your ThingSpeak channel in settings to begin monitoring.
                     </p>
                     <Button asChild size="lg" className="px-8 shadow-xl shadow-primary/20">
-                      <a href="/settings">Configure Connection</a>
+                      <Link to="/settings">Configure Connection</Link>
                     </Button>
                   </div>
                 ) : (
