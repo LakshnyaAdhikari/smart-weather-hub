@@ -33,3 +33,34 @@ A real-time weather monitoring dashboard for environmental sensors connected to 
    npm install
    # or
    bun install
+   ```
+
+2. **Build for production:**
+   ```bash
+   npm run build
+   ```
+
+3. **Preview locally:**
+   ```bash
+   npm run preview
+   ```
+
+## Firebase Hosting
+
+1. Install Firebase CLI if needed:
+   ```bash
+   npm install -g firebase-tools
+   # or use npx
+   npx firebase login
+   npx firebase init hosting
+   ```
+
+2. Set your Firebase project in `.firebaserc` by replacing `YOUR_FIREBASE_PROJECT_ID`.
+
+3. Deploy the app:
+   ```bash
+   npm run build
+   npm run deploy
+   ```
+
+The project is configured to host the built Vite output from `dist/` and rewrite all routes to `index.html` for the SPA.
